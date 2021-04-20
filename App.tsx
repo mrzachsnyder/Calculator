@@ -45,7 +45,7 @@ export default function App() {
       },
       buttonText: {
         color: '#FFFFFF',
-        fontSize: 24,
+        fontSize: 40,
         fontWeight: 'bold',
       },
     };
@@ -112,8 +112,6 @@ export default function App() {
     setInput(inputString);
   }
 
-
-
   return (
     <View style={styles.container}>
 
@@ -131,7 +129,7 @@ export default function App() {
           {history.ans.map(item => {
             return (
               <Text style={styles.historyText} onPress={() => handleHistoryPress(item)}>
-                {item}
+                {item === "" ? item : parseFloat(item).toPrecision(5)}
               </Text>
             );
           })}
@@ -205,20 +203,21 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   ansHistory: {
-    flex: 1.4,
+    flex: 4,
     backgroundColor: '#292C33',
     justifyContent: 'flex-end',
+    alignItems: 'flex-end',
   },
   historyText: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 45,
     fontWeight: 'bold',
     paddingLeft: 10,
     paddingBottom: 5,
   },
   //  Input view (should probably combine with history view)
   inputView: {
-    height: 34,
+    height: 50,
     marginTop: 5,
     marginBottom: 5,
     backgroundColor: '#292C33',
@@ -227,7 +226,7 @@ const styles = StyleSheet.create({
   },
   inputText: {
     color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     paddingLeft: 10,
   },
