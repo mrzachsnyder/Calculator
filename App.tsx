@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -10,8 +9,8 @@ import {
 export default function App() {
   const [input, setInput] =  useState('');
   const [history, setHistory] = useState({
-    input: [''],
-    ans: [''],
+    input: [],
+    ans: [],
   });
 
   type ButtonProps = {
@@ -19,7 +18,7 @@ export default function App() {
     value: string,
   }
 
-  // TODO: Make this a separate component
+  // TODO: Try separating this component
   const Button = (props: ButtonProps) => {
     // Programatically assign color to the button based on its function
     const assignColor = (props: ButtonProps) => {
@@ -55,6 +54,7 @@ export default function App() {
         style = {styles.button}
         underlayColor = {() => assignColor(props)}
         onPress = {() => handleButtonPress(props)}
+        onLongPress={() => clearHistory(props)}
       >
         <Text style={styles.buttonText}>{props.value}</Text>
       </TouchableOpacity>
@@ -74,12 +74,11 @@ export default function App() {
         input: newInputHistory,
         ans: newAnsHistory,
       }));
-      // Clear the input now that we've solved it
+      // Clear the input now that we've evaluated the expression
       setInput('');
     }
     else if (props.value==='C') {
       setInput('');
-      // Future: double or long press to clear history
     }
     else {
       const inputString = input + props.value;
@@ -93,6 +92,10 @@ export default function App() {
     // Not getting sophisticated yet, just using JavaScript's eval() function
     try {
       result = eval(expression);
+      const size = result.toString().length;
+      if (size > 5) {
+        result = parseFloat(result).toPrecision(4);
+      }
     }
     catch (error) {
       if (error instanceof SyntaxError) {
@@ -112,24 +115,44 @@ export default function App() {
     setInput(inputString);
   }
 
+  // Clear the input history
+  const clearHistory = (props: ButtonProps) => {
+    // Only clear the history if the long press is on the clear key
+    if (props.value === 'C') {
+      setHistory({
+        input: [],
+        ans: [],
+      });
+    }
+  }
+
   return (
     <View style={styles.container}>
 
       <View style={styles.historyView}>
-        <View  style={styles.inputHistory}>
+        <View  style={styles.inputColumn}>
           {history.input.map(item => {
             return (
-              <Text style={styles.historyText} onPress={() => handleHistoryPress(item)}>
-                {item}
+              <Text style={styles.historyText} onPress={() => handleHistoryPress(item)} numberOfLines={1}>
+                {item.toString().length > 4 ? parseFloat(item).toPrecision(4) : item}
               </Text>
             );
           })}
         </View>
-        <View style={styles.ansHistory}>
+        <View  style={styles.equalsColumn}>
+          {history.input.map(item  => {
+            return (
+              <Text style={styles.historyText}>
+                =
+              </Text>
+            );
+          })}
+        </View>
+        <View  style={styles.answerColumn}>
           {history.ans.map(item => {
             return (
-              <Text style={styles.historyText} onPress={() => handleHistoryPress(item)}>
-                {item === "" ? item : parseFloat(item).toPrecision(5)}
+              <Text style={styles.historyText} numberOfLines={1} onPress={() => handleHistoryPress(item)}>
+                {item}
               </Text>
             );
           })}
@@ -170,10 +193,11 @@ export default function App() {
         <View style={styles.buttonRow}>
           <Button type='number' value='0' />
           <Button type='number' value='.' />
-          <Button type='number' value='-' />
+          <Button type='number' value='<-' />
           <Button type='operator' value='=' />
         </View>
       </View>
+      
     </View>
   );
 }
@@ -194,19 +218,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomColor: '#000000',
     borderBottomWidth: 2,
-  },
-  inputHistory: {
-    flex: 4,
-    backgroundColor: '#292C33',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-    marginRight: 10,
-  },
-  ansHistory: {
-    flex: 4,
-    backgroundColor: '#292C33',
-    justifyContent: 'flex-end',
     alignItems: 'flex-end',
+  },
+  inputColumn: {
+    flex: 4,
+  },
+  equalsColumn: {
+    flex: 1,
+  },
+  answerColumn: {
+    flex: 4,
   },
   historyText: {
     color: '#FFFFFF',
