@@ -3,14 +3,13 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 
 export default function App() {
   const [input, setInput] =  useState('');
   const [history, setHistory] = useState({
-    input: [],
-    ans: [],
+    data: []
   });
 
   type ButtonProps = {
@@ -18,7 +17,6 @@ export default function App() {
     value: string,
   }
 
-  // TODO: Try separating this component
   const Button = (props: ButtonProps) => {
     // Programatically assign color to the button based on its function
     const assignColor = (props: ButtonProps) => {
@@ -63,24 +61,24 @@ export default function App() {
 
   const handleButtonPress = (props: ButtonProps) => {
     if (props.value==='=') {
+      // Solve the expression
       const answer = solve(input); // Undefined and NaN checks are performed in the solve function
-      // This feels like a sketchy way of adding items to the history state array
-      let newInputHistory = history.input;
-      newInputHistory.push(input);
-      let newAnsHistory = history.ans;
-      newAnsHistory.push(answer);
-      setHistory(history => ({
-        ...history,
-        input: newInputHistory,
-        ans: newAnsHistory,
-      }));
-      // Clear the input now that we've evaluated the expression
+      // Add input and answer to history state array
+      const updatedHistory = history.data.concat({input: input, answer: answer})
+      setHistory({ data: updatedHistory });
+      // Clear input
       setInput('');
     }
     else if (props.value==='C') {
+      // Clear input
       setInput('');
     }
+    else if (props.value==='<') {
+      // Backspace input value
+      setInput(input.slice(0, -1));
+    }
     else {
+      // Add user-selected expression to input field
       const inputString = input + props.value;
       setInput(inputString);
     }
@@ -92,10 +90,6 @@ export default function App() {
     // Not getting sophisticated yet, just using JavaScript's eval() function
     try {
       result = eval(expression);
-      const size = result.toString().length;
-      if (size > 5) {
-        result = parseFloat(result).toPrecision(4);
-      }
     }
     catch (error) {
       if (error instanceof SyntaxError) {
@@ -103,7 +97,7 @@ export default function App() {
       }
       else {
         alert('Unknown error in solve function.');
-        result = 'ERROR';
+        result = 'Error';
       }
     }
     return result;
@@ -120,47 +114,33 @@ export default function App() {
     // Only clear the history if the long press is on the clear key
     if (props.value === 'C') {
       setHistory({
-        input: [],
-        ans: [],
+        data: []
       });
     }
   }
 
   return (
     <View style={styles.container}>
-
       <View style={styles.historyView}>
-        <View  style={styles.inputColumn}>
-          {history.input.map(item => {
-            return (
-              <Text style={styles.historyText} onPress={() => handleHistoryPress(item)} numberOfLines={1}>
-                {item.toString().length > 4 ? parseFloat(item).toPrecision(4) : item}
+        {history.data.map((item, index) => {
+          return (
+            <View style={styles.historyRow} key={"item" + index}>
+              <Text style={styles.defaultText} onPress={() => handleHistoryPress(item.input)} numberOfLines={1} adjustsFontSizeToFit={true}>
+                {item.input}
               </Text>
-            );
-          })}
-        </View>
-        <View  style={styles.equalsColumn}>
-          {history.input.map(item  => {
-            return (
-              <Text style={styles.historyText}>
+              <Text style={styles.equalSignText}>
                 =
               </Text>
-            );
-          })}
-        </View>
-        <View  style={styles.answerColumn}>
-          {history.ans.map(item => {
-            return (
-              <Text style={styles.historyText} numberOfLines={1} onPress={() => handleHistoryPress(item)}>
-                {item}
+              <Text style={styles.defaultText} onPress={() => handleHistoryPress(item.answer)} numberOfLines={1} adjustsFontSizeToFit={true}>
+                {parseFloat(item.answer) > 1000000 ? parseFloat(item.answer).toPrecision(5) : item.answer }
               </Text>
-            );
-          })}
-        </View>
+            </View>
+          );
+        })}
       </View>
 
       <View style={styles.inputView}>
-        <Text style={styles.inputText}>
+        <Text style={styles.defaultText}>
           {input}
         </Text>
       </View>
@@ -193,11 +173,11 @@ export default function App() {
         <View style={styles.buttonRow}>
           <Button type='number' value='0' />
           <Button type='number' value='.' />
-          <Button type='number' value='<-' />
+          <Button type='number' value='<' />
           <Button type='operator' value='=' />
         </View>
       </View>
-      
+
     </View>
   );
 }
@@ -207,49 +187,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#292C33',
-    alignItems: 'stretch',
-    justifyContent: 'center',
   },
   // History view
   historyView: {
     flex: 4,
     marginTop: 25,
     backgroundColor: '#292C33',
-    flexDirection: 'row',
+    flexDirection: 'column',
     borderBottomColor: '#000000',
     borderBottomWidth: 2,
-    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
   },
-  inputColumn: {
-    flex: 4,
+ historyRow: {
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
   },
-  equalsColumn: {
-    flex: 1,
-  },
-  answerColumn: {
-    flex: 4,
-  },
-  historyText: {
+  defaultText: {
+    flex: 5,
     color: '#FFFFFF',
+    marginHorizontal: 5,
+    marginVertical: 2,
     fontSize: 45,
     fontWeight: 'bold',
-    paddingLeft: 10,
-    paddingBottom: 5,
+    textAlign: 'center',
   },
-  //  Input view (should probably combine with history view)
+  equalSignText: {
+    flex: 1,
+    color: '#FFFFFF',
+    marginVertical: 2,
+    fontSize: 35,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  // Input view
   inputView: {
-    height: 50,
-    marginTop: 5,
-    marginBottom: 5,
+    flex: 1,
     backgroundColor: '#292C33',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  inputText: {
-    color: '#FFFFFF',
-    fontSize: 40,
-    fontWeight: 'bold',
-    paddingLeft: 10,
   },
   // Button grid
   buttonGrid: {
