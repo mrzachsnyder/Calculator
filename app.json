@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Shop Calculator",
-    "slug": "shop-calculator",
+    "name": "Workshop Calculator",
+    "slug": "workshop-calculator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mrzachsnyder.shopcalculator",
+      "bundleIdentifier": "com.mrzachsnyder.workshopcalculator",
       "buildNumber": "1.0.0",
     },
     "android": {
@@ -26,13 +26,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.mrzachsnyder.calculator",
+      "package": "com.mrzachsnyder.workshopcalculator",
         "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "Test deployment of calculator app.",
-    "githubUrl": "https://github.com/mrzachsnyder/Calculator"
+    "description": "A simple calculator for people who make things",
+    "githubUrl": "https://github.com/mrzachsnyder/workshop-calculator"
   }
 }

@@ -1,4 +1,4 @@
-# A simple calculator for people who build things.
+# A simple calculator for people who make things.
 ## Overview
 I still use my TI-84 graphing calculator, mostly because I've spent countless hours with it in Mechanical Engineering school. I know it like the back of my hand! I'd love to start using infinitely more powerful phone in my pocket, but the TI-84 has one specific feature that the iOS calculator doesn't: it allows you to both view and access your previous entries.
 
