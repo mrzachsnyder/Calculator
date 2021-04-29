@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Calculator",
-    "slug": "calculator",
+    "name": "Shop Calculator",
+    "slug": "shop-calculator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mrzachsnyder.calculator",
+      "bundleIdentifier": "com.mrzachsnyder.shopcalculator",
       "buildNumber": "1.0.0",
     },
     "android": {
