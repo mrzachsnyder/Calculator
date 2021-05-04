@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
+  FlatList,
+  SafeAreaView,
 } from 'react-native';
 
 export default function App() {
@@ -11,6 +13,8 @@ export default function App() {
   const [history, setHistory] = useState({
     data: []
   });
+
+  const refContainer = useRef(null);
 
   type ButtonProps = {
     type: string,
@@ -63,9 +67,12 @@ export default function App() {
     if (props.value==='=') {
       // Solve the expression
       const answer = solve(input); // Undefined and NaN checks are performed in the solve function
+      const index = history.data.length.toString();
       // Add input and answer to history state array
-      const updatedHistory = history.data.concat({input: input, answer: answer})
+      const updatedHistory = history.data.concat({input: input, answer: answer, key: index })
       setHistory({ data: updatedHistory });
+      // TODO: Figure out why this is one behind
+      refContainer.current.scrollToEnd();
       // Clear input
       setInput('');
     }
@@ -119,28 +126,35 @@ export default function App() {
     }
   }
 
+  // TODO: Figure out how to type these, maybe find a better solution than index
+  const renderItem = ({ item, index }) => {
+    return (
+      <View style={styles.historyRow} key={index}>
+        <Text style={styles.defaultText} onPress={() => handleHistoryPress(item.input)} numberOfLines={1} adjustsFontSizeToFit={true}>
+          {item.input}
+        </Text>
+        <Text style={styles.equalSignText}>
+          =
+        </Text>
+        <Text style={styles.defaultText} onPress={() => handleHistoryPress(item.answer)} numberOfLines={1} adjustsFontSizeToFit={true}>
+          {parseFloat(item.answer) > 1000000 ? parseFloat(item.answer).toPrecision(5) : item.answer }
+        </Text>
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.historyView}>
-        {history.data.map((item, index) => {
-          return (
-            <View style={styles.historyRow} key={"item" + index}>
-              <Text style={styles.defaultText} onPress={() => handleHistoryPress(item.input)} numberOfLines={1} adjustsFontSizeToFit={true}>
-                {item.input}
-              </Text>
-              <Text style={styles.equalSignText}>
-                =
-              </Text>
-              <Text style={styles.defaultText} onPress={() => handleHistoryPress(item.answer)} numberOfLines={1} adjustsFontSizeToFit={true}>
-                {parseFloat(item.answer) > 1000000 ? parseFloat(item.answer).toPrecision(5) : item.answer }
-              </Text>
-            </View>
-          );
-        })}
+        <FlatList
+          ref = {refContainer}
+          data = {history.data}
+          renderItem = {renderItem}
+        />
       </View>
 
       <View style={styles.inputView}>
-        <Text style={styles.defaultText}>
+        <Text style={styles.defaultText} numberOfLines={1} adjustsFontSizeToFit={true}>
           {input}
         </Text>
       </View>
@@ -178,7 +192,7 @@ export default function App() {
         </View>
       </View>
 
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -196,7 +210,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     borderBottomColor: '#000000',
     borderBottomWidth: 2,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
  historyRow: {
   flexDirection: 'row',
@@ -229,7 +243,7 @@ const styles = StyleSheet.create({
   },
   // Button grid
   buttonGrid: {
-    flex: 7,
+    flex: 5,
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'center',
